@@ -8,29 +8,33 @@
         body {
             font-family: 'Poppins', sans-serif;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background: url('college.png') no-repeat center center/cover;
             flex-direction: column;
+            align-items: center;
+            margin: 0;
+            min-height: 100vh;
+            background: url('college.jpg') no-repeat center center/cover;
             color: white;
         }
         h1 {
-            font-size: 28px;
+            font-size: 36px;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             text-align: center;
-            margin-bottom: 20px;
+            margin: 30px 0 10px 0;
+            padding-top: 20px;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+            color: #00ffcc; /* Brighter color */
         }
         .container {
             background: rgba(0, 0, 0, 0.85);
             padding: 20px;
             border-radius: 15px;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
             text-align: center;
             max-width: 450px;
             width: 100%;
             animation: fadeIn 1s ease-in-out;
+            margin: 20px auto;
         }
         input, select {
             width: 100%;
@@ -39,7 +43,7 @@
             border: none;
             border-radius: 5px;
             font-size: 16px;
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.9);
             color: black;
         }
         button {
@@ -60,7 +64,7 @@
             width: 100%;
             margin-top: 20px;
             border-collapse: collapse;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             color: black;
         }
         th, td {
@@ -83,16 +87,18 @@
     </style>
 </head>
 <body>
+
     <h1>College Bus Tracking System</h1>
-    <img src="bus.png" alt="Bus Image" width="200px" style="margin-bottom: 20px;">
+
     <div class="container" id="phoneLoginContainer">
         <h2>Login with Phone Number</h2>
         <input type="tel" id="phoneNumber" placeholder="Enter your phone number" required>
         <button onclick="showLoginOptions()">Next</button>
     </div>
-    
+
     <div class="container" id="loginContainer" style="display: none;">
         <h2>Login</h2>
+        <img src="bus.png" alt="Bus Image" width="200px" style="margin-bottom: 20px;">
         <select id="userType">
             <option value="driver">Login as Driver</option>
             <option value="management">Login as Management</option>
@@ -100,10 +106,12 @@
         <input type="text" id="idNumber" placeholder="Enter your ID number" required>
         <button onclick="goToNextPage()">Login</button>
     </div>
-    
+
     <div class="container" id="driverPage" style="display: none;">
         <h2>Driver Status</h2>
-        <button onclick="updateLocation()">Update Location</button>
+        <img src="gps.jpg" alt="GPS Image" width="200px" style="margin-bottom: 20px;">
+        <button onclick="updateDriverLocation()">Update Location</button>
+        <p id="driverLocation">Location: Fetching...</p>
         <table>
             <tr>
                 <th>S. No</th>
@@ -128,7 +136,7 @@
             </tr>
         </table>
     </div>
-    
+
     <div class="container" id="managementPage" style="display: none;">
         <h2>Bus Management</h2>
         <table>
@@ -142,17 +150,17 @@
                 <td>1</td>
                 <td>TN-45-1234</td>
                 <td class="active">Running</td>
-                <td id="location1"><img src="gps.png" width="20px"> Fetching...</td>
+                <td id="location1">Fetching...</td>
             </tr>
             <tr>
                 <td>2</td>
                 <td>TN-45-5678</td>
                 <td class="inactive">Not in Service</td>
-                <td id="location2"><img src="gps.png" width="20px"> Fetching...</td>
+                <td id="location2">Fetching...</td>
             </tr>
         </table>
     </div>
-    
+
     <script>
         function showLoginOptions() {
             let phoneNumber = document.getElementById('phoneNumber').value;
@@ -174,17 +182,31 @@
             document.getElementById('loginContainer').style.display = 'none';
             if (userType === "driver") {
                 document.getElementById('driverPage').style.display = 'block';
+                updateDriverLocation();
             } else {
                 document.getElementById('managementPage').style.display = 'block';
-                getLocation();
+                updateManagementLocations();
             }
         }
 
-        function getLocation() {
+        function updateDriverLocation() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function(position) {
-                    document.getElementById('location1').innerText = position.coords.latitude + ", " + position.coords.longitude;
-                    document.getElementById('location2').innerText = position.coords.latitude + ", " + position.coords.longitude;
+                    document.getElementById('driverLocation').innerText = "Location: " + position.coords.latitude + ", " + position.coords.longitude;
+                }, function() {
+                    alert('Unable to retrieve location');
+                });
+            } else {
+                alert('Geolocation is not supported by this browser.');
+            }
+        }
+
+        function updateManagementLocations() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    let locationText = position.coords.latitude + ", " + position.coords.longitude;
+                    document.getElementById('location1').innerText = locationText;
+                    document.getElementById('location2').innerText = locationText;
                 }, function() {
                     alert('Unable to retrieve location');
                 });
