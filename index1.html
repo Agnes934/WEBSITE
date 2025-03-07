@@ -3,31 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Driver Status</title>
+    <title>College Bus Tracking System</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #f4f4f4;
+            background: url('college.png') no-repeat center center/cover;
             flex-direction: column;
+            color: white;
+        }
+        h1 {
+            font-size: 28px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-align: center;
+            margin-bottom: 20px;
         }
         .container {
-            background: #fff;
+            background: rgba(0, 0, 0, 0.85);
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
             text-align: center;
+            max-width: 450px;
+            width: 100%;
+            animation: fadeIn 1s ease-in-out;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.8);
+            color: black;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #ff5733;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+        button:hover {
+            background-color: #c70039;
         }
         table {
             width: 100%;
             margin-top: 20px;
             border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.9);
+            color: black;
         }
         th, td {
-            padding: 10px;
+            padding: 12px;
             border: 1px solid #ccc;
             text-align: center;
         }
@@ -39,47 +76,120 @@
             color: red;
             font-weight: bold;
         }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Enter Your ID</h2>
-        <input type="text" id="driverId" placeholder="Enter your ID number" required>
-        <button onclick="showStatus()">Submit</button>
-        <div id="statusTable" style="display: none;">
-            <h2>Driver Status</h2>
-            <table>
-                <tr>
-                    <th>S. No</th>
-                    <th>Morning Status</th>
-                    <th>Bus Number</th>
-                    <th>Afternoon Status</th>
-                    <th>Bus Number</th>
-                </tr>
-                <tr>
-                    <td>1</td>
-                    <td class="active">Active</td>
-                    <td>Bus 101</td>
-                    <td class="inactive">Not Active</td>
-                    <td>Bus 102</td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td class="inactive">Not Active</td>
-                    <td>Bus 103</td>
-                    <td class="active">Active</td>
-                    <td>Bus 104</td>
-                </tr>
-            </table>
-        </div>
+    <h1>College Bus Tracking System</h1>
+    <img src="bus.png" alt="Bus Image" width="200px" style="margin-bottom: 20px;">
+    <div class="container" id="phoneLoginContainer">
+        <h2>Login with Phone Number</h2>
+        <input type="tel" id="phoneNumber" placeholder="Enter your phone number" required>
+        <button onclick="showLoginOptions()">Next</button>
     </div>
+    
+    <div class="container" id="loginContainer" style="display: none;">
+        <h2>Login</h2>
+        <select id="userType">
+            <option value="driver">Login as Driver</option>
+            <option value="management">Login as Management</option>
+        </select>
+        <input type="text" id="idNumber" placeholder="Enter your ID number" required>
+        <button onclick="goToNextPage()">Login</button>
+    </div>
+    
+    <div class="container" id="driverPage" style="display: none;">
+        <h2>Driver Status</h2>
+        <button onclick="updateLocation()">Update Location</button>
+        <table>
+            <tr>
+                <th>S. No</th>
+                <th>Morning Status</th>
+                <th>Bus Number</th>
+                <th>Afternoon Status</th>
+                <th>Bus Number</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td class="active">Active</td>
+                <td>Bus 101</td>
+                <td class="inactive">Not Active</td>
+                <td>Bus 102</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td class="inactive">Not Active</td>
+                <td>Bus 103</td>
+                <td class="active">Active</td>
+                <td>Bus 104</td>
+            </tr>
+        </table>
+    </div>
+    
+    <div class="container" id="managementPage" style="display: none;">
+        <h2>Bus Management</h2>
+        <table>
+            <tr>
+                <th>S. No</th>
+                <th>Vehicle Number</th>
+                <th>Status</th>
+                <th>Location</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>TN-45-1234</td>
+                <td class="active">Running</td>
+                <td id="location1"><img src="gps.png" width="20px"> Fetching...</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>TN-45-5678</td>
+                <td class="inactive">Not in Service</td>
+                <td id="location2"><img src="gps.png" width="20px"> Fetching...</td>
+            </tr>
+        </table>
+    </div>
+    
     <script>
-        function showStatus() {
-            let driverId = document.getElementById('driverId').value;
-            if(driverId) {
-                document.getElementById('statusTable').style.display = 'block';
+        function showLoginOptions() {
+            let phoneNumber = document.getElementById('phoneNumber').value;
+            if (!phoneNumber) {
+                alert('Please enter your phone number');
+                return;
+            }
+            document.getElementById('phoneLoginContainer').style.display = 'none';
+            document.getElementById('loginContainer').style.display = 'block';
+        }
+
+        function goToNextPage() {
+            let userType = document.getElementById('userType').value;
+            let idNumber = document.getElementById('idNumber').value;
+            if (!idNumber) {
+                alert('Please enter your ID number');
+                return;
+            }
+            document.getElementById('loginContainer').style.display = 'none';
+            if (userType === "driver") {
+                document.getElementById('driverPage').style.display = 'block';
             } else {
-                alert('Please enter your ID');
+                document.getElementById('managementPage').style.display = 'block';
+                getLocation();
+            }
+        }
+
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    document.getElementById('location1').innerText = position.coords.latitude + ", " + position.coords.longitude;
+                    document.getElementById('location2').innerText = position.coords.latitude + ", " + position.coords.longitude;
+                }, function() {
+                    alert('Unable to retrieve location');
+                });
+            } else {
+                alert('Geolocation is not supported by this browser.');
             }
         }
     </script>
